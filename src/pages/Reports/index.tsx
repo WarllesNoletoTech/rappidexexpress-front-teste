@@ -73,6 +73,26 @@ export function Reports() {
     return "";
   }
 
+  function getReportFiltersParam() {
+    const params = new URLSearchParams({
+      status: selectedStatus,
+      itemsPerPage: "50",
+    });
+
+    if (selectedMotoboy) {
+      params.set("motoboyId", selectedMotoboy);
+    }
+    if (selectedEstablishment) {
+      params.set("establishmentId", selectedEstablishment);
+    }
+    if (createdIn) {
+      params.set("createdIn", createdIn);
+      params.set("createdUntil", createdUntil || createdIn);
+    }
+
+    return params;
+  }
+
   async function onClickSearch() {
     if (loading) {
       return;
@@ -80,30 +100,15 @@ export function Reports() {
 
     setLoading(true);
 
-    let param = "";
-    if (selectedMotoboy) {
-      param = `${param}&motoboyId=${selectedMotoboy}`;
-    }
-    if (selectedEstablishment) {
-      param = `${param}&establishmentId=${selectedEstablishment}`;
-    }
-    if (createdIn) {
-      param = `${param}&createdIn=${encodeURIComponent(createdIn)}`;
-    }
-    if (createdUntil) {
-      param = `${param}&createdUntil=${encodeURIComponent(createdUntil)}`;
-    }
-
     try {
-      const response = await api.get(
-        `/delivery?status=${selectedStatus}&itemsPerPage=50${param}`,
-      );
+      const params = getReportFiltersParam();
+      const response = await api.get(`/delivery?${params.toString()}`);
       setReports(response.data.data);
       setPage(2);
       setReportsCount(response.data.count);
       setLoading(false);
     } catch (error: any) {
-      alert(error.response.data.message);
+      alert(getErrorMessage(error, "Não foi possível buscar os relatórios."));
       setLoading(false);
     }
   }
@@ -127,30 +132,16 @@ export function Reports() {
 
     setLoadingMoreReports(true);
 
-    let param = "";
-    if (selectedMotoboy) {
-      param = `${param}&motoboyId=${selectedMotoboy}`;
-    }
-    if (selectedEstablishment) {
-      param = `${param}&establishmentId=${selectedEstablishment}`;
-    }
-    if (createdIn) {
-      param = `${param}&createdIn=${encodeURIComponent(createdIn)}`;
-    }
-    if (createdUntil) {
-      param = `${param}&createdUntil=${encodeURIComponent(createdUntil)}`;
-    }
-
     try {
-      const response = await api.get(
-        `/delivery?status=${selectedStatus}&page=${page}&itemsPerPage=50${param}`,
-      );
+      const params = getReportFiltersParam();
+      params.set("page", String(page));
+      const response = await api.get(`/delivery?${params.toString()}`);
       setReports([...reports, ...response.data.data]);
       setPage(page + 1);
       setReportsCount(response.data.count);
       setLoadingMoreReports(false);
     } catch (error: any) {
-      alert(error.response.data.message);
+      alert(getErrorMessage(error, "Não foi possível carregar mais relatórios."));
       setLoadingMoreReports(false);
     }
   }
@@ -387,7 +378,12 @@ export function Reports() {
               <input
                 type="date"
                 value={createdIn}
-                onChange={(e) => setCreatedIn(e.target.value)}
+                onChange={(e) => {
+                  setCreatedIn(e.target.value);
+                  if (createdUntil && e.target.value > createdUntil) {
+                    setCreatedUntil(e.target.value);
+                  }
+                }}
               />{" "}
               <br />
             </form>

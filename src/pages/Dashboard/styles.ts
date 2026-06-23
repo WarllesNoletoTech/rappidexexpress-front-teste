@@ -1,5 +1,5 @@
-import styled, { keyframes } from 'styled-components'
-import { StatusDelivery } from '../../shared/constants/enums.constants';
+import styled, { keyframes } from "styled-components";
+import { StatusDelivery } from "../../shared/constants/enums.constants";
 
 export const Container = styled.main`
   flex: 1;
@@ -72,10 +72,14 @@ export const ContainerButtons = styled.div`
 
 export const ShopkeeperCreditsContainer = styled.div`
   width: min(100%, 1200px);
-  background: linear-gradient(145deg, ${(props) => props.theme['gray-700']}, ${(props) => props.theme['gray-800']});
+  background: linear-gradient(
+    145deg,
+    ${(props) => props.theme["gray-700"]},
+    ${(props) => props.theme["gray-800"]}
+  );
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: ${(props) => props.theme['radius-lg']};
-  box-shadow: ${(props) => props.theme['shadow-soft']};
+  border-radius: ${(props) => props.theme["radius-lg"]};
+  box-shadow: ${(props) => props.theme["shadow-soft"]};
   padding: 1rem;
   margin: 0.5rem 0 1rem;
   display: flex;
@@ -86,19 +90,19 @@ export const ShopkeeperCreditsContainer = styled.div`
 export const ShopkeeperCreditsHistory = styled.div`
   max-height: 12rem;
   overflow-y: auto;
-  border-top: 1px solid ${(props) => props.theme['gray-500']};
+  border-top: 1px solid ${(props) => props.theme["gray-500"]};
   padding-top: 0.5rem;
   font-size: 0.875rem;
 `;
 
 export const ShopkeeperCreditsHistoryItem = styled.div`
   padding: 0.4rem 0;
-  border-bottom: 1px solid ${(props) => props.theme['gray-600']};
+  border-bottom: 1px solid ${(props) => props.theme["gray-600"]};
 `;
 
 export const ShopkeeperCreditsToggleButton = styled.button`
-  background: ${(props) => props.theme['gray-500']};
-  color: ${(props) => props.theme['gray-100']};
+  background: ${(props) => props.theme["gray-500"]};
+  color: ${(props) => props.theme["gray-100"]};
   border: 0;
   border-radius: 0.75rem;
   font-weight: 700;
@@ -119,17 +123,20 @@ export const ShopkeeperCreditsToggleButton = styled.button`
 `;
 
 interface ButtonProps {
-  typeReport: boolean
+  typeReport: boolean;
 }
 
 export const BaseButton = styled.div<ButtonProps>`
   flex: 1 1 12rem;
   min-height: 3rem;
   background: ${(props) =>
-    props.typeReport ? props.theme['brand-yellow'] : props.theme['gray-700']};
+    props.typeReport ? props.theme["brand-yellow"] : props.theme["gray-700"]};
 
-  border: 1px solid ${(props) =>
-    props.typeReport ? props.theme['brand-yellow'] : 'rgba(255, 255, 255, 0.08)'};
+  border: 1px solid
+    ${(props) =>
+      props.typeReport
+        ? props.theme["brand-yellow"]
+        : "rgba(255, 255, 255, 0.08)"};
   padding: 0.75rem 1rem;
   border-radius: 999px;
 
@@ -139,13 +146,16 @@ export const BaseButton = styled.div<ButtonProps>`
 
   font-weight: bold;
   color: ${(props) =>
-    props.typeReport ? props.theme.black : props.theme['gray-300']};
+    props.typeReport ? props.theme.black : props.theme["gray-300"]};
 
   cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
 
   &:hover {
-    border-color: ${(props) => props.theme['brand-yellow']};
+    border-color: ${(props) => props.theme["brand-yellow"]};
     transform: translateY(-1px);
   }
 
@@ -159,8 +169,8 @@ export const ContainerDeliveries = styled.div`
   background: rgba(28, 28, 28, 0.82);
   width: min(100%, 1200px);
   border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: ${(props) => props.theme['radius-xl']};
-  box-shadow: ${(props) => props.theme['shadow-card']};
+  border-radius: ${(props) => props.theme["radius-xl"]};
+  box-shadow: ${(props) => props.theme["shadow-card"]};
   padding: 0.4rem;
   box-sizing: border-box;
 
@@ -179,19 +189,20 @@ export const ContainerDeliveries = styled.div`
 `;
 
 interface DeliveryProps {
-  isfree: boolean
-  isIfood?: boolean
+  isfree: boolean;
+  isIfood?: boolean;
 }
 
 export const Delivery = styled.div<DeliveryProps>`
   background: ${(props) =>
-    `linear-gradient(145deg, ${props.theme['gray-700']}, ${props.theme['gray-800']})`};
-  border: 1px solid ${(props) =>
-    props.isfree ? props.theme['brand-yellow'] : 'rgba(255, 255, 255, 0.08)'};
+    `linear-gradient(145deg, ${props.theme["gray-700"]}, ${props.theme["gray-800"]})`};
+  border: 1px solid
+    ${(props) =>
+      props.isfree ? props.theme["brand-yellow"] : "rgba(255, 255, 255, 0.08)"};
   box-shadow: 0 0.9rem 1.8rem rgba(0, 0, 0, 0.22);
   padding: 1.125rem;
   margin: 0.45rem auto;
-  border-radius: ${(props) => props.theme['radius-lg']};
+  border-radius: ${(props) => props.theme["radius-lg"]};
   box-sizing: border-box;
   width: calc(100% - 1rem);
   max-width: 620px;
@@ -217,7 +228,7 @@ export const Link = styled.a`
   display: flex;
   gap: 0.2rem;
   text-decoration: none;
-  color: ${(props) => props.theme['gray-300']};
+  color: ${(props) => props.theme["gray-300"]};
   font-weight: bold;
   width: fit-content;
   max-width: 100%;
@@ -266,7 +277,6 @@ export const ContainerImagem = styled.div`
   }
 `;
 
-
 export const IfoodStoreBadge = styled.span`
   display: inline-flex;
   align-items: center;
@@ -274,7 +284,7 @@ export const IfoodStoreBadge = styled.span`
   margin-bottom: 0.35rem;
   padding: 0.2rem 0.48rem;
   border-radius: 999px;
-  background: ${(props) => props.theme['brand-yellow-dark']};
+  background: ${(props) => props.theme["brand-yellow-dark"]};
   color: ${(props) => props.theme.black};
   font-size: 0.68rem;
   font-weight: 700;
@@ -293,7 +303,7 @@ export const ShopkeeperInfo = styled.div`
 
   > p:first-of-type {
     margin: 0 0 0.35rem;
-    color: ${(props) => props.theme['gray-100']};
+    color: ${(props) => props.theme["gray-100"]};
     font-size: 1.08rem;
     font-weight: 800;
     line-height: 1.2;
@@ -313,8 +323,10 @@ export const ShopkeeperInfo = styled.div`
     padding: 0.28rem 0.48rem;
     font-size: 0.9rem;
     border-radius: 999px;
-    background: ${(props) => props.theme['gray-600']};
-    transition: filter 0.2s ease, transform 0.2s ease;
+    background: ${(props) => props.theme["gray-600"]};
+    transition:
+      filter 0.2s ease,
+      transform 0.2s ease;
   }
 
   a:hover {
@@ -379,12 +391,12 @@ export const ContainerInfo = styled.div`
 `;
 
 interface InfoSectionProps {
-  $variant?: 'main' | 'operational'
+  $variant?: "main" | "operational";
 }
 
 export const SectionTitle = styled.h3`
   margin: 0;
-  color: ${(props) => props.theme['gray-100']};
+  color: ${(props) => props.theme["gray-100"]};
   font-size: 0.76rem;
   font-weight: 800;
   line-height: 1.2;
@@ -398,11 +410,12 @@ export const InfoSection = styled.div<InfoSectionProps>`
   gap: 0.38rem;
   max-width: 100%;
   min-width: 0;
-  padding-top: ${(props) => (props.$variant === 'operational' ? '0.55rem' : '0')};
+  padding-top: ${(props) =>
+    props.$variant === "operational" ? "0.55rem" : "0"};
   border-top: ${(props) =>
-    props.$variant === 'operational'
-      ? '1px solid rgba(255, 255, 255, 0.1)'
-      : '0'};
+    props.$variant === "operational"
+      ? "1px solid rgba(255, 255, 255, 0.1)"
+      : "0"};
 `;
 
 export const InfoRow = styled.div`
@@ -421,7 +434,7 @@ export const InfoRow = styled.div`
 `;
 
 export const InfoLabel = styled.span`
-  color: ${(props) => props.theme['gray-300']};
+  color: ${(props) => props.theme["gray-300"]};
   font-size: 0.72rem;
   font-weight: 700;
   line-height: 1.35;
@@ -432,7 +445,7 @@ export const InfoLabel = styled.span`
 `;
 
 export const InfoValue = styled.span`
-  color: ${(props) => props.theme['gray-100']};
+  color: ${(props) => props.theme["gray-100"]};
   font-size: 0.9rem;
   font-weight: 600;
   line-height: 1.35;
@@ -482,14 +495,14 @@ export const OrderActions = styled.div`
 `;
 
 interface OrderProps {
-  typebutton: boolean
+  typebutton: boolean;
 }
 
 export const OrderButton = styled.div<OrderProps>`
   min-height: 2.35rem;
   min-width: 6.4rem;
   background: ${(props) =>
-    props.typebutton ? props.theme['brand-yellow'] : props.theme['red-700']};
+    props.typebutton ? props.theme["brand-yellow"] : props.theme["red-700"]};
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 0.75rem;
   padding: 0.55rem 0.8rem;
@@ -500,12 +513,15 @@ export const OrderButton = styled.div<OrderProps>`
   text-align: center;
 
   font-weight: 800;
-  color: ${(props) => props.theme['gray-100']};
+  color: ${(props) => props.theme["gray-100"]};
   font-size: 0.92rem;
   line-height: 1.2;
 
   cursor: pointer;
-  transition: filter 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    filter 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   box-shadow: 0 0.45rem 1rem rgba(0, 0, 0, 0.16);
 
   &:hover {
@@ -530,7 +546,7 @@ export const SelectContainer = styled.div`
   min-width: 0;
 
   label {
-    color: ${(props) => props.theme['gray-300']};
+    color: ${(props) => props.theme["gray-300"]};
     font-size: 0.72rem;
     font-weight: 800;
     line-height: 1.35;
@@ -543,7 +559,7 @@ export const SelectContainer = styled.div`
   input {
     height: 2.4rem;
     background: rgba(39, 39, 42, 0.82);
-    color: ${(props) => props.theme['gray-100']};
+    color: ${(props) => props.theme["gray-100"]};
     width: min(100%, 34rem);
     max-width: 100%;
     min-width: 0;
@@ -553,13 +569,15 @@ export const SelectContainer = styled.div`
     padding: 0 0.7rem;
     outline: none;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease,
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease,
       background 0.2s ease;
   }
 
   select:focus,
   input:focus {
-    border-color: ${(props) => props.theme['brand-yellow']};
+    border-color: ${(props) => props.theme["brand-yellow"]};
     box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.14);
   }
 
@@ -597,7 +615,7 @@ export const ContainerStatus = styled.div`
 `;
 
 interface StatusProps {
-  type: string
+  type: string;
 }
 
 export const Status = styled.p<StatusProps>`
@@ -610,10 +628,12 @@ export const Status = styled.p<StatusProps>`
   border-radius: 999px;
   background-color: ${(props) =>
     props.type === StatusDelivery.ONCOURSE
-      ? 'rgba(37, 99, 235, 0.92)'
-      : props.theme['brand-yellow-dark']};
+      ? "rgba(37, 99, 235, 0.92)"
+      : props.theme["brand-yellow-dark"]};
   color: ${(props) =>
-    props.type === StatusDelivery.ONCOURSE ? props.theme.white : props.theme.black};
+    props.type === StatusDelivery.ONCOURSE
+      ? props.theme.white
+      : props.theme.black};
   font-size: 0.7rem;
   font-weight: 800;
   line-height: 1.2;
@@ -631,7 +651,7 @@ export const Flag = styled.p`
   height: 1.45rem;
   padding: 0 0.4rem;
   border-radius: 999px;
-  background: ${(props) => props.theme['brand-yellow-dark']};
+  background: ${(props) => props.theme["brand-yellow-dark"]};
   color: ${(props) => props.theme.black};
   font-size: 0.78rem;
   font-weight: 900;
@@ -645,28 +665,34 @@ export const PerformanceCard = styled.button`
   display: flex;
   align-items: center;
   gap: 1rem;
-  border: 1px solid ${(props) => props.theme['brand-yellow']};
-  border-radius: ${(props) => props.theme['radius-lg']};
-  background: linear-gradient(145deg, ${(props) => props.theme['gray-700']}, ${(props) => props.theme['gray-800']});
-  box-shadow: ${(props) => props.theme['shadow-soft']};
-  color: ${(props) => props.theme['gray-100']};
+  border: 1px solid ${(props) => props.theme["brand-yellow"]};
+  border-radius: ${(props) => props.theme["radius-lg"]};
+  background: linear-gradient(
+    145deg,
+    ${(props) => props.theme["gray-700"]},
+    ${(props) => props.theme["gray-800"]}
+  );
+  box-shadow: ${(props) => props.theme["shadow-soft"]};
+  color: ${(props) => props.theme["gray-100"]};
   text-align: left;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 
   > svg {
     flex-shrink: 0;
-    color: ${(props) => props.theme['brand-yellow']};
+    color: ${(props) => props.theme["brand-yellow"]};
   }
 
   &:hover,
   &:focus-visible {
     transform: translateY(-1px);
-    box-shadow: ${(props) => props.theme['shadow-card']};
+    box-shadow: ${(props) => props.theme["shadow-card"]};
   }
 
   &:focus-visible {
-    outline: 2px solid ${(props) => props.theme['brand-yellow']};
+    outline: 2px solid ${(props) => props.theme["brand-yellow"]};
     outline-offset: 3px;
   }
 
@@ -693,27 +719,71 @@ export const PerformanceMetric = styled.span`
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  color: ${(props) => props.theme['gray-300']};
+  color: ${(props) => props.theme["gray-300"]};
   font-size: 0.82rem;
   font-weight: 700;
 
   strong {
-    color: ${(props) => props.theme['gray-100']};
+    color: ${(props) => props.theme["gray-100"]};
     font-size: 1.35rem;
   }
 `;
 
 export const PerformanceValue = styled.strong`
-  color: ${(props) => props.theme['brand-yellow']} !important;
+  color: ${(props) => props.theme["brand-yellow"]} !important;
 `;
 
 export const PerformanceHint = styled.span`
   flex-shrink: 0;
-  color: ${(props) => props.theme['gray-400']};
+  color: ${(props) => props.theme["gray-400"]};
   font-size: 0.72rem;
   font-weight: 600;
 
   @media (max-width: 600px) {
     display: none;
+  }
+`;
+
+export const AdminFinancialCard = styled.div`
+  width: min(100%, 1200px);
+  margin: 0.5rem 0 1rem;
+  padding: 1rem 1.15rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid ${(props) => props.theme["brand-yellow"]};
+  border-radius: ${(props) => props.theme["radius-lg"]};
+  background: linear-gradient(
+    145deg,
+    ${(props) => props.theme["gray-700"]},
+    ${(props) => props.theme["gray-800"]}
+  );
+  box-shadow: ${(props) => props.theme["shadow-soft"]};
+  color: ${(props) => props.theme["gray-100"]};
+
+  > svg {
+    flex-shrink: 0;
+    color: ${(props) => props.theme["brand-yellow"]};
+  }
+
+  @media (max-width: 600px) {
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.9rem;
+  }
+`;
+
+export const AdminCitySelect = styled.select`
+  flex-shrink: 0;
+  min-width: 13rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: ${(props) => props.theme["radius-sm"]};
+  background: ${(props) => props.theme["gray-900"]};
+  color: ${(props) => props.theme["gray-100"]};
+  padding: 0.65rem 0.75rem;
+  font-weight: 700;
+
+  @media (max-width: 600px) {
+    width: 100%;
   }
 `;

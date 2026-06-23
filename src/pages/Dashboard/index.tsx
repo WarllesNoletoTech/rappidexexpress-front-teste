@@ -10,7 +10,7 @@ import {
 } from "react";
 import { Modal } from "@mui/material";
 import { io } from "socket.io-client";
-import { ChartLineUp, MapPin, WhatsappLogo } from "phosphor-react";
+import { ChartLineUp, MapPin, Money, WhatsappLogo } from "phosphor-react";
 
 import { DeliveryContext } from "../../context/DeliveryContext";
 import api, { SOCKET_URL } from "../../services/api";
@@ -22,6 +22,8 @@ import {
 } from "../../shared/constants/whatsapp.constants";
 
 import {
+  AdminCitySelect,
+  AdminFinancialCard,
   BaseButton,
   Container,
   ContainerButtons,
@@ -81,6 +83,14 @@ type DeliveryUpdateData = {
 type DeliveryCountsDelta = {
   pending: number;
   assigned: number;
+};
+
+type AdminFinancialCounts = {
+  totalEntregas: number;
+  valorAdminPorEntrega: number;
+  totalValorAdmin: number;
+  cityId?: string | null;
+  cityName?: string | null;
 };
 
 type DeliveryCardProps = {
@@ -698,6 +708,14 @@ export function Dashboard() {
   const [pendingCount, setPendingCount] = useState<number>(0);
   const [assignedCount, setAssignedCount] = useState<number>(0);
   const [waitingReleaseCount, setWaitingReleaseCount] = useState<number>(0);
+  const [adminFinancialCounts, setAdminFinancialCounts] =
+    useState<AdminFinancialCounts>({
+      totalEntregas: 0,
+      valorAdminPorEntrega: 0,
+      totalValorAdmin: 0,
+      cityId: null,
+      cityName: null,
+    });
   const [updatingDeliveryIds, setUpdatingDeliveryIds] = useState<Set<string>>(
     () => new Set(),
   );
@@ -728,6 +746,8 @@ export function Dashboard() {
   const [canManageReleaseOrder, setCanManageReleaseOrder] = useState<boolean>(
     permission === UserType.ADMIN || permission === UserType.SUPERADMIN,
   );
+  const [isCurrentUserSuperAdmin, setIsCurrentUserSuperAdmin] =
+    useState<boolean>(permission === UserType.SUPERADMIN);
   const reloadTimeoutRef = useRef<number | null>(null);
   const refreshRequestIdRef = useRef(0);
   const didFirstLoadRef = useRef(false);
@@ -850,6 +870,24 @@ export function Dashboard() {
         currency: "BRL",
       }),
     [selectedPerformance.total],
+  );
+  const isAdminDashboardUser =
+    permission === UserType.ADMIN || permission === UserType.SUPERADMIN;
+  const formattedAdminDeliveryFee = useMemo(
+    () =>
+      adminFinancialCounts.valorAdminPorEntrega.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      }),
+    [adminFinancialCounts.valorAdminPorEntrega],
+  );
+  const formattedAdminTotal = useMemo(
+    () =>
+      adminFinancialCounts.totalValorAdmin.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      }),
+    [adminFinancialCounts.totalValorAdmin],
   );
 
   const clientWhatsappMessageByCityId = useMemo(() => {
@@ -990,9 +1028,23 @@ export function Dashboard() {
       }
 
       try {
+        const countsParams = new URLSearchParams();
+        if (isCurrentUserSuperAdmin && currentCityId) {
+          countsParams.set("cityId", currentCityId);
+        }
+
+        const deliveryParams = new URLSearchParams({ status });
+        if (isCurrentUserSuperAdmin && currentCityId) {
+          deliveryParams.set("cityId", currentCityId);
+        }
+
+        const countsUrl = countsParams.toString()
+          ? `/delivery/counts?${countsParams.toString()}`
+          : "/delivery/counts";
+
         const [currentResponse, countsResponse] = await Promise.all([
-          api.get(`/delivery?status=${status}`),
-          api.get("/delivery/counts"),
+          api.get(`/delivery?${deliveryParams.toString()}`),
+          api.get(countsUrl),
         ]);
 
         if (requestId !== refreshRequestIdRef.current) {
@@ -1011,6 +1063,14 @@ export function Dashboard() {
         setPendingCount(nextPendingCount);
         setAssignedCount(nextAssignedCount);
         setWaitingReleaseCount(nextWaitingReleaseCount);
+        setAdminFinancialCounts({
+          totalEntregas: Number(countsResponse.data?.totalEntregas) || 0,
+          valorAdminPorEntrega:
+            Number(countsResponse.data?.valorAdminPorEntrega) || 0,
+          totalValorAdmin: Number(countsResponse.data?.totalValorAdmin) || 0,
+          cityId: countsResponse.data?.cityId ?? null,
+          cityName: countsResponse.data?.cityName ?? null,
+        });
       } catch (error: any) {
         if (requestId !== refreshRequestIdRef.current) {
           return;
@@ -1023,7 +1083,7 @@ export function Dashboard() {
         }
       }
     },
-    [status],
+    [currentCityId, isCurrentUserSuperAdmin, status],
   );
 
   const refreshDeliveryPerformance = useCallback(async () => {
@@ -1104,7 +1164,9 @@ export function Dashboard() {
       const currentUser = response.data?.data ?? response.data ?? {};
 
       setCurrentUserId(currentUser.id ?? "");
-      setCurrentCityId(currentUser.cityId ?? "");
+      setCurrentCityId(
+        (currentCity) => currentCity || currentUser.cityId || "",
+      );
 
       const currentType = String(
         currentUser.type || permission || "",
@@ -1152,6 +1214,7 @@ export function Dashboard() {
 
       setCanViewReleaseTab(nextCanViewReleaseTab);
       setCanManageReleaseOrder(nextCanManageReleaseOrder);
+      setIsCurrentUserSuperAdmin(currentType === UserType.SUPERADMIN);
     } catch (error) {
       console.error("Erro ao carregar usuário atual:", error);
     }
@@ -1841,6 +1904,46 @@ export function Dashboard() {
           void handleConfirmObservation();
         }}
       />
+
+      {isAdminDashboardUser && (
+        <AdminFinancialCard>
+          <Money size={24} weight="duotone" aria-hidden="true" />
+          <PerformanceMetrics>
+            <PerformanceMetric>
+              <span>Entregas da cidade</span>
+              <strong>{adminFinancialCounts.totalEntregas}</strong>
+            </PerformanceMetric>
+            <PerformanceMetric>
+              <span>Valor por entrega</span>
+              <PerformanceValue>{formattedAdminDeliveryFee}</PerformanceValue>
+            </PerformanceMetric>
+            <PerformanceMetric>
+              <span>Total a receber</span>
+              <PerformanceValue>{formattedAdminTotal}</PerformanceValue>
+            </PerformanceMetric>
+            <PerformanceMetric>
+              <span>Cidade</span>
+              <strong>
+                {adminFinancialCounts.cityName || "Não selecionada"}
+              </strong>
+            </PerformanceMetric>
+          </PerformanceMetrics>
+          {isCurrentUserSuperAdmin && (
+            <AdminCitySelect
+              value={currentCityId}
+              onChange={(event) => setCurrentCityId(event.target.value)}
+              aria-label="Selecionar cidade do contador administrativo"
+            >
+              <option value="">Selecione a cidade</option>
+              {cities.map((city) => (
+                <option key={city.id} value={city.id}>
+                  {city.name}
+                </option>
+              ))}
+            </AdminCitySelect>
+          )}
+        </AdminFinancialCard>
+      )}
 
       {isCurrentUserMotoboy && (
         <PerformanceCard

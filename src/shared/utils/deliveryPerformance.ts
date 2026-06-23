@@ -102,7 +102,10 @@ function getCityDeliveryValue(
   deliveryValueByCityId: Map<string, number>,
 ) {
   const cityId = String(
-    report.establishmentCityId || report.cityId || "",
+    report.establishmentCityId ||
+      report.cityId ||
+      report.establishment?.cityId ||
+      "",
   ).trim();
   if (!cityId) return 0;
 
@@ -159,7 +162,7 @@ export function calculateDeliveryPerformance(
       normalizedStatus === StatusDelivery.FINISHED ||
       normalizedStatus === "COMPLETED";
     const assignedMotoboyId =
-      report.motoboyId || report.motoboy?._id || report.motoboy?.id;
+      report.motoboyId || report.motoboy?.id || report.motoboy?._id;
 
     if (!isFinished || String(assignedMotoboyId) !== String(motoboyId)) {
       return;

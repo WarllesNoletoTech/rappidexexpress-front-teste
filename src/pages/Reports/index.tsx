@@ -33,7 +33,6 @@ import api from "../../services/api";
 import { DeliveryContext } from "../../context/DeliveryContext";
 import { User, Report } from "../../shared/interfaces";
 import { Loader } from "../../components/Loader";
-import { createLocalDate } from "../../shared/utils/deliveryPerformance";
 
 export function Reports() {
   const { token, permission } = useContext(DeliveryContext);
@@ -89,10 +88,10 @@ export function Reports() {
       param = `${param}&establishmentId=${selectedEstablishment}`;
     }
     if (createdIn) {
-      param = `${param}&createdIn=${encodeURIComponent(createLocalDate(createdIn).toISOString())}`;
+      param = `${param}&createdIn=${encodeURIComponent(createdIn)}`;
     }
     if (createdUntil) {
-      param = `${param}&createdUntil=${encodeURIComponent(createLocalDate(createdUntil, true).toISOString())}`;
+      param = `${param}&createdUntil=${encodeURIComponent(createdUntil)}`;
     }
 
     try {
@@ -136,10 +135,10 @@ export function Reports() {
       param = `${param}&establishmentId=${selectedEstablishment}`;
     }
     if (createdIn) {
-      param = `${param}&createdIn=${encodeURIComponent(createLocalDate(createdIn).toISOString())}`;
+      param = `${param}&createdIn=${encodeURIComponent(createdIn)}`;
     }
     if (createdUntil) {
-      param = `${param}&createdUntil=${encodeURIComponent(createLocalDate(createdUntil, true).toISOString())}`;
+      param = `${param}&createdUntil=${encodeURIComponent(createdUntil)}`;
     }
 
     try {
@@ -148,6 +147,7 @@ export function Reports() {
       );
       setReports([...reports, ...response.data.data]);
       setPage(page + 1);
+      setReportsCount(response.data.count);
       setLoadingMoreReports(false);
     } catch (error: any) {
       alert(error.response.data.message);

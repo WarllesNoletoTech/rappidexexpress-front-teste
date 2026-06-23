@@ -26,6 +26,7 @@ export interface Report {
     isActive: boolean;
     motoboyId: string;
     motoboy?: { id?: string; _id?: string };
+    establishment?: { cityId?: string };
     motoboyName: string;
     motoboyPhone: string;
     payment: string;

@@ -33,6 +33,7 @@ import api from "../../services/api";
 import { DeliveryContext } from "../../context/DeliveryContext";
 import { User, Report } from "../../shared/interfaces";
 import { Loader } from "../../components/Loader";
+import { createLocalDate } from "../../shared/utils/deliveryPerformance";
 
 export function Reports() {
   const { token, permission } = useContext(DeliveryContext);
@@ -100,6 +101,23 @@ export function Reports() {
 
     setLoading(true);
 
+<<<<<<< HEAD
+=======
+    let param = "";
+    if (selectedMotoboy) {
+      param = `${param}&motoboyId=${selectedMotoboy}`;
+    }
+    if (selectedEstablishment) {
+      param = `${param}&establishmentId=${selectedEstablishment}`;
+    }
+    if (createdIn) {
+      param = `${param}&createdIn=${encodeURIComponent(createLocalDate(createdIn).toISOString())}`;
+    }
+    if (createdUntil) {
+      param = `${param}&createdUntil=${encodeURIComponent(createLocalDate(createdUntil, true).toISOString())}`;
+    }
+
+>>>>>>> parent of 464b12c (Fix delivery report date filters)
     try {
       const params = getReportFiltersParam();
       const response = await api.get(`/delivery?${params.toString()}`);
@@ -132,13 +150,29 @@ export function Reports() {
 
     setLoadingMoreReports(true);
 
+<<<<<<< HEAD
+=======
+    let param = "";
+    if (selectedMotoboy) {
+      param = `${param}&motoboyId=${selectedMotoboy}`;
+    }
+    if (selectedEstablishment) {
+      param = `${param}&establishmentId=${selectedEstablishment}`;
+    }
+    if (createdIn) {
+      param = `${param}&createdIn=${encodeURIComponent(createLocalDate(createdIn).toISOString())}`;
+    }
+    if (createdUntil) {
+      param = `${param}&createdUntil=${encodeURIComponent(createLocalDate(createdUntil, true).toISOString())}`;
+    }
+
+>>>>>>> parent of 464b12c (Fix delivery report date filters)
     try {
       const params = getReportFiltersParam();
       params.set("page", String(page));
       const response = await api.get(`/delivery?${params.toString()}`);
       setReports([...reports, ...response.data.data]);
       setPage(page + 1);
-      setReportsCount(response.data.count);
       setLoadingMoreReports(false);
     } catch (error: any) {
       alert(getErrorMessage(error, "Não foi possível carregar mais relatórios."));

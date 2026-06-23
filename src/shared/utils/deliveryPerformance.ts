@@ -16,6 +16,48 @@ type DateRange = {
   end: Date;
 };
 
+type YmdDateRange = {
+  start: string;
+  end: string;
+};
+
+export function formatDateToYmd(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+export function getTodayYmdRange(referenceDate = new Date()): YmdDateRange {
+  const today = formatDateToYmd(referenceDate);
+
+  return {
+    start: today,
+    end: today,
+  };
+}
+
+export function getRappidexWeekYmdRange(
+  referenceDate = new Date(),
+): YmdDateRange {
+  const date = new Date(referenceDate);
+  const weekStartDay = 2; // terça-feira
+  const currentDay = date.getDay();
+  const diffToTuesday = (currentDay - weekStartDay + 7) % 7;
+
+  const start = new Date(date);
+  start.setDate(date.getDate() - diffToTuesday);
+
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+
+  return {
+    start: formatDateToYmd(start),
+    end: formatDateToYmd(end),
+  };
+}
+
 export function createLocalDate(dateString: string, endOfDay = false): Date {
   const [year, month, day] = dateString.split("-").map(Number);
 
@@ -124,6 +166,15 @@ export function getMotoboyDeliveryValue(report: Report, cities: City[]) {
   });
 
   return getCityDeliveryValue(report, deliveryValueByCityId);
+}
+
+export function calculateReportsMotoboyTotal(
+  reports: Report[],
+  cities: City[],
+) {
+  return reports.reduce((total, report) => {
+    return total + getMotoboyDeliveryValue(report, cities);
+  }, 0);
 }
 
 export function formatMotoboyDeliveryGain(value: number) {

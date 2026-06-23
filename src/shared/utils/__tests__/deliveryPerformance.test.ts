@@ -5,10 +5,14 @@ import { StatusDelivery } from "../../constants/enums.constants";
 import type { City, Report } from "../../interfaces";
 import {
   calculateDeliveryPerformance,
+  calculateReportsMotoboyTotal,
   createLocalDate,
+  formatDateToYmd,
   formatMotoboyDeliveryGain,
   getMotoboyDeliveryValue,
   getRappidexWeekRange,
+  getRappidexWeekYmdRange,
+  getTodayYmdRange,
 } from "../deliveryPerformance";
 
 const city: City = { id: "city-1", name: "Cidade", deliveryValue: "R$ 8,50" };
@@ -41,6 +45,25 @@ function report(overrides: Partial<Report>): Report {
     ...overrides,
   };
 }
+
+test("cria filtros YYYY-MM-DD locais sem depender de toISOString", () => {
+  assert.equal(formatDateToYmd(new Date(2026, 5, 2, 23, 30)), "2026-06-02");
+  assert.deepEqual(getTodayYmdRange(new Date(2026, 5, 2, 23, 30)), {
+    start: "2026-06-02",
+    end: "2026-06-02",
+  });
+});
+
+test("cria filtros YYYY-MM-DD da semana Rappidex de terça a segunda", () => {
+  assert.deepEqual(getRappidexWeekYmdRange(new Date(2026, 5, 8, 12)), {
+    start: "2026-06-02",
+    end: "2026-06-08",
+  });
+  assert.deepEqual(getRappidexWeekYmdRange(new Date(2026, 5, 9, 12)), {
+    start: "2026-06-09",
+    end: "2026-06-15",
+  });
+});
 
 test("cria limites locais inclusivos para o filtro manual", () => {
   assert.deepEqual(
@@ -150,4 +173,14 @@ test("usa zero no aviso quando a cidade não tem valor configurado", () => {
 
   assert.equal(getMotoboyDeliveryValue(report({}), [cityWithoutValue]), 0);
   assert.equal(formatMotoboyDeliveryGain(0), "+R$ 0,00");
+});
+
+test("soma o valor do motoboy pela cidade sem afetar a quantidade", () => {
+  const reports = [
+    report({ id: "one" }),
+    report({ id: "two" }),
+    report({ id: "without-city-value", establishmentCityId: "city-2" }),
+  ];
+
+  assert.equal(calculateReportsMotoboyTotal(reports, [city]), 17);
 });

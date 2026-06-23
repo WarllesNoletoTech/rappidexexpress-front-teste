@@ -15,6 +15,7 @@ import { ChartLineUp, MapPin, WhatsappLogo } from "phosphor-react";
 import { DeliveryContext } from "../../context/DeliveryContext";
 import api, { SOCKET_URL } from "../../services/api";
 import { City, Motoboy, Report } from "../../shared/interfaces";
+import type { DeliveryPerformancePeriods } from "../../shared/utils/deliveryPerformance";
 import {
   getLinkToWhatsapp,
   messageTypes,
@@ -61,9 +62,11 @@ import {
   UserType,
 } from "../../shared/constants/enums.constants";
 import {
-  calculateDeliveryPerformance,
+  calculateReportsMotoboyTotal,
   formatMotoboyDeliveryGain,
   getMotoboyDeliveryValue,
+  getRappidexWeekYmdRange,
+  getTodayYmdRange,
 } from "../../shared/utils/deliveryPerformance";
 
 type DeliveryUpdateData = {
@@ -682,7 +685,11 @@ export function Dashboard() {
   const [status, setStatus] = useState<string>(`${StatusDelivery.PENDING}`);
   const [loading, setLoading] = useState<boolean>(true);
   const [reports, setReports] = useState<Report[]>([]);
-  const [finishedReports, setFinishedReports] = useState<Report[]>([]);
+  const [deliveryPerformanceCounts, setDeliveryPerformanceCounts] =
+    useState<DeliveryPerformancePeriods>({
+      today: { count: 0, total: 0 },
+      week: { count: 0, total: 0 },
+    });
   const [performancePeriod, setPerformancePeriod] = useState<"week" | "today">(
     "week",
   );
@@ -833,12 +840,7 @@ export function Dashboard() {
     return new Set(status.split(",").filter(Boolean));
   }, [status]);
 
-  const deliveryPerformance = useMemo(
-    () => calculateDeliveryPerformance(finishedReports, currentUserId, cities),
-    [cities, currentUserId, finishedReports],
-  );
-
-  const selectedPerformance = deliveryPerformance[performancePeriod];
+  const selectedPerformance = deliveryPerformanceCounts[performancePeriod];
   const performancePeriodLabel =
     performancePeriod === "week" ? "na semana" : "hoje";
   const formattedPerformanceValue = useMemo(
@@ -1026,41 +1028,49 @@ export function Dashboard() {
 
   const refreshDeliveryPerformance = useCallback(async () => {
     if (!isCurrentUserMotoboy || !currentUserId) {
-      setFinishedReports([]);
+      setDeliveryPerformanceCounts({
+        today: { count: 0, total: 0 },
+        week: { count: 0, total: 0 },
+      });
       return;
     }
 
     try {
       const itemsPerPage = 500;
-      const firstResponse = await api.get(
-        `/delivery?status=${StatusDelivery.FINISHED}&itemsPerPage=${itemsPerPage}`,
-      );
-      const firstPage = Array.isArray(firstResponse.data?.data)
-        ? firstResponse.data.data
-        : [];
-      const totalReports =
-        Number(firstResponse.data?.count) || firstPage.length;
-      const totalPages = Math.ceil(totalReports / itemsPerPage);
-      const remainingResponses = await Promise.all(
-        Array.from({ length: Math.max(totalPages - 1, 0) }, (_, index) =>
-          api.get(
-            `/delivery?status=${StatusDelivery.FINISHED}&itemsPerPage=${itemsPerPage}&page=${index + 2}`,
-          ),
-        ),
-      );
-      const finalizedDeliveries = remainingResponses.reduce<Report[]>(
-        (allReports, response) =>
-          allReports.concat(
-            Array.isArray(response.data?.data) ? response.data.data : [],
-          ),
-        firstPage,
-      );
+      const todayRange = getTodayYmdRange();
+      const weekRange = getRappidexWeekYmdRange();
 
-      setFinishedReports(finalizedDeliveries);
+      const [todayResponse, weekResponse] = await Promise.all([
+        api.get(
+          `/delivery?status=${StatusDelivery.FINISHED}&createdIn=${todayRange.start}&createdUntil=${todayRange.end}&itemsPerPage=${itemsPerPage}`,
+        ),
+        api.get(
+          `/delivery?status=${StatusDelivery.FINISHED}&createdIn=${weekRange.start}&createdUntil=${weekRange.end}&itemsPerPage=${itemsPerPage}`,
+        ),
+      ]);
+
+      const todayReports = Array.isArray(todayResponse.data?.data)
+        ? todayResponse.data.data
+        : [];
+
+      const weekReports = Array.isArray(weekResponse.data?.data)
+        ? weekResponse.data.data
+        : [];
+
+      setDeliveryPerformanceCounts({
+        today: {
+          count: Number(todayResponse.data?.count) || todayReports.length,
+          total: calculateReportsMotoboyTotal(todayReports, cities),
+        },
+        week: {
+          count: Number(weekResponse.data?.count) || weekReports.length,
+          total: calculateReportsMotoboyTotal(weekReports, cities),
+        },
+      });
     } catch (error) {
       console.error("Erro ao carregar desempenho do motoboy:", error);
     }
-  }, [currentUserId, isCurrentUserMotoboy]);
+  }, [cities, currentUserId, isCurrentUserMotoboy]);
 
   const getCities = useCallback(async () => {
     try {
@@ -1270,6 +1280,7 @@ export function Dashboard() {
         await Promise.all([refreshDashboard(false), getMotoboys()]);
         if (newStatus === StatusDelivery.FINISHED) {
           showDeliveryGain(report);
+          void refreshDeliveryPerformance();
         }
         alert(`Solicitação avançada para o passo ${newStatus}`);
         return;
@@ -1297,6 +1308,7 @@ export function Dashboard() {
       void getMotoboys();
       if (newStatus === StatusDelivery.FINISHED) {
         showDeliveryGain({ ...report, ...updatedReport });
+        void refreshDeliveryPerformance();
       }
       alert(`Solicitação avançada para o passo ${newStatus}`);
       setDeliveryCodeByReport((state) => {

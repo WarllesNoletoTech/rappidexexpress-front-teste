@@ -499,7 +499,7 @@ export function NewUser() {
             type="text"
             inputMode="numeric"
             id="phone"
-            placeholder="Ex: 5594991220268 ou 94991220268"
+            placeholder="Ex: 5594991000000 ou 94991000000"
             {...register("phone")}
           />
 
@@ -552,7 +552,7 @@ export function NewUser() {
               <label htmlFor="cityId">Cidade:</label>
               <select
                 id="cityId"
-                value={selectedCityId}
+               value={selectedCityId}
                 onChange={(event) => setSelectedCityId(event.target.value)}
                 disabled={citiesLoading}
               >

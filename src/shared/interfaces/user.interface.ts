@@ -26,6 +26,7 @@ export interface User {
   pix?: string;
   useIfoodIntegration?: boolean;
   usesExternalIfoodPdv?: boolean;
+  ifoodWithoutPreparationTime?: boolean;
   ifoodOrdersReleased?: number;
   ifoodOrdersUsed?: number;
   ifoodOrdersAvailable?: number;

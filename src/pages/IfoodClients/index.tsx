@@ -208,6 +208,9 @@ export function IfoodClients() {
         usesExternalIfoodPdv:
           Boolean(shopkeeper.useIfoodIntegration) &&
           Boolean(shopkeeper.usesExternalIfoodPdv),
+        ifoodWithoutPreparationTime:
+          Boolean(shopkeeper.useIfoodIntegration) &&
+          Boolean(shopkeeper.ifoodWithoutPreparationTime),
         ifoodMerchantId: merchantId,
         ifoodMerchants: merchants,
       });
@@ -352,6 +355,9 @@ export function IfoodClients() {
                             usesExternalIfoodPdv: event.target.checked
                               ? Boolean(shopkeeper.usesExternalIfoodPdv)
                               : false,
+                            ifoodWithoutPreparationTime: event.target.checked
+                              ? Boolean(shopkeeper.ifoodWithoutPreparationTime)
+                              : false,
                             ifoodMerchantId: event.target.checked
                               ? shopkeeper.ifoodMerchantId
                               : '',
@@ -374,6 +380,21 @@ export function IfoodClients() {
                           type="checkbox"
                         />
                         Usa PDV externo integrado ao iFood?
+                      </Checkbox>
+                    )}
+
+                    {shopkeeper.useIfoodIntegration && (
+                      <Checkbox>
+                        <input
+                          checked={Boolean(shopkeeper.ifoodWithoutPreparationTime)}
+                          onChange={(event) =>
+                            updateLocalUser(shopkeeper.id, {
+                              ifoodWithoutPreparationTime: event.target.checked,
+                            })
+                          }
+                          type="checkbox"
+                        />
+                        Sem tempo de preparo: pedido iFood vai direto para Livres
                       </Checkbox>
                     )}
                   </ToggleGroup>

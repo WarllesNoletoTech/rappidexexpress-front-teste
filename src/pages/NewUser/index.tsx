@@ -29,6 +29,7 @@ const ProfileFormValidationSchema = zod.object({
   location: zod.string(),
   useIfoodIntegration: zod.boolean().optional(),
   usesExternalIfoodPdv: zod.boolean().optional(),
+  ifoodWithoutPreparationTime: zod.boolean().optional(),
   ifoodMerchantId: zod.string().optional(),
 });
 
@@ -53,6 +54,7 @@ export function NewUser() {
     location: "",
     useIfoodIntegration: false,
     usesExternalIfoodPdv: false,
+    ifoodWithoutPreparationTime: false,
     ifoodMerchantId: "",
   });
   const [ifoodMerchants, setIfoodMerchants] = useState<IfoodMerchantForm[]>([]);
@@ -117,6 +119,9 @@ export function NewUser() {
     const usesExternalIfoodPdv = useIfoodIntegration
       ? Boolean(data.usesExternalIfoodPdv)
       : false;
+    const ifoodWithoutPreparationTime = useIfoodIntegration
+      ? Boolean(data.ifoodWithoutPreparationTime)
+      : false;
     const normalizedMerchants = ifoodMerchants
       .map((merchant) => ({
         ...merchant,
@@ -151,6 +156,7 @@ export function NewUser() {
         cityId: cityIdToSubmit,
         useIfoodIntegration,
         usesExternalIfoodPdv,
+        ifoodWithoutPreparationTime,
         ifoodMerchantId,
         ifoodMerchants: normalizedMerchants,
       });
@@ -244,6 +250,7 @@ export function NewUser() {
       useIfoodIntegration,
       ifoodMerchantId,
       usesExternalIfoodPdv,
+      ifoodWithoutPreparationTime,
     } = getValues();
     const normalizedMerchants = ifoodMerchants
       .map((merchant) => ({
@@ -266,6 +273,8 @@ export function NewUser() {
       const response = await api.put(`/user/${userId}`, {
         useIfoodIntegration: Boolean(useIfoodIntegration),
         usesExternalIfoodPdv: Boolean(useIfoodIntegration) && Boolean(usesExternalIfoodPdv),
+        ifoodWithoutPreparationTime:
+          Boolean(useIfoodIntegration) && Boolean(ifoodWithoutPreparationTime),
         ifoodMerchantId: resolvedIfoodMerchantId,
         ifoodMerchants: normalizedMerchants,
       });
@@ -566,6 +575,8 @@ export function NewUser() {
 
               if (nextType !== "shopkeeper" && nextType !== "shopkeeperadmin") {
                 setValue("useIfoodIntegration", false);
+                setValue("usesExternalIfoodPdv", false);
+                setValue("ifoodWithoutPreparationTime", false);
                 setValue("ifoodMerchantId", "");
               }
             }}
@@ -590,6 +601,7 @@ export function NewUser() {
 
                     if (!enabled) {
                       setValue("usesExternalIfoodPdv", false);
+                      setValue("ifoodWithoutPreparationTime", false);
                       setValue("ifoodMerchantId", "");
                       setIfoodMerchants([]);
                     }
@@ -607,6 +619,14 @@ export function NewUser() {
                       {...register("usesExternalIfoodPdv")}
                     />{" "}
                     Usa PDV externo integrado ao iFood?
+                  </label>
+                  <label htmlFor="ifoodWithoutPreparationTime">
+                    <input
+                      type="checkbox"
+                      id="ifoodWithoutPreparationTime"
+                      {...register("ifoodWithoutPreparationTime")}
+                    />{" "}
+                    Sem tempo de preparo: pedido iFood vai direto para Livres
                   </label>
                   <label htmlFor="ifoodMerchantId">iFood Merchant ID (legado):</label>
                   <BaseInput

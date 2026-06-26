@@ -136,7 +136,7 @@ export function Header() {
               {canAccessAdminMenu && (
                 <MobileMenuLink to="/novo-usuario" onClick={closeMobileMenu}>
                   <UserPlus size={21} />
-                  <span>Clientes</span>
+                  <span>Novo Usuário</span>
                 </MobileMenuLink>
               )}
               {canAccessAdminMenu && (

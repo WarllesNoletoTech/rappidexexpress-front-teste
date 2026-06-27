@@ -703,6 +703,51 @@ export const PerformanceCard = styled.button`
   }
 `;
 
+export const ClosedWeekSettlementCard = styled.div`
+  width: min(100%, 1200px);
+  margin: 0.5rem 0 0.75rem;
+  padding: 1rem 1.15rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid ${(props) => props.theme["brand-yellow"]};
+  border-radius: ${(props) => props.theme["radius-lg"]};
+  background: linear-gradient(
+    145deg,
+    ${(props) => props.theme["gray-700"]},
+    ${(props) => props.theme["gray-800"]}
+  );
+  box-shadow: ${(props) => props.theme["shadow-soft"]};
+  color: ${(props) => props.theme["gray-100"]};
+
+  > svg {
+    flex-shrink: 0;
+    color: ${(props) => props.theme["brand-yellow"]};
+  }
+
+  @media (max-width: 600px) {
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.9rem;
+  }
+`;
+
+export const SettlementDetails = styled.span`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.25rem;
+  color: ${(props) => props.theme["gray-300"]};
+  font-size: 0.82rem;
+  font-weight: 700;
+`;
+
+export const SettlementMessage = styled.span`
+  color: ${(props) => props.theme["gray-400"]};
+  font-size: 0.78rem;
+  font-weight: 700;
+`;
+
 export const PerformanceMetrics = styled.span`
   flex: 1;
   display: grid;

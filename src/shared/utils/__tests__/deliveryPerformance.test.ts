@@ -10,6 +10,7 @@ import {
   formatDateToYmd,
   formatMotoboyDeliveryGain,
   getMotoboyDeliveryValue,
+  getLastClosedRappidexWeekYmdRange,
   getRappidexWeekRange,
   getRappidexWeekYmdRange,
   getTodayYmdRange,
@@ -62,6 +63,21 @@ test("cria filtros YYYY-MM-DD da semana Rappidex de terça a segunda", () => {
   assert.deepEqual(getRappidexWeekYmdRange(new Date(2026, 5, 9, 12)), {
     start: "2026-06-09",
     end: "2026-06-15",
+  });
+});
+
+test("cria filtros YYYY-MM-DD da última semana Rappidex fechada", () => {
+  assert.deepEqual(getLastClosedRappidexWeekYmdRange(new Date(2026, 5, 9, 12)), {
+    start: "2026-06-02",
+    end: "2026-06-08",
+  });
+  assert.deepEqual(getLastClosedRappidexWeekYmdRange(new Date(2026, 5, 12, 12)), {
+    start: "2026-06-02",
+    end: "2026-06-08",
+  });
+  assert.deepEqual(getLastClosedRappidexWeekYmdRange(new Date(2026, 5, 15, 12)), {
+    start: "2026-06-02",
+    end: "2026-06-08",
   });
 });
 

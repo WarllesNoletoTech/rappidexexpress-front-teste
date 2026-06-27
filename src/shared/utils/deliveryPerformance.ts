@@ -58,6 +58,22 @@ export function getRappidexWeekYmdRange(
   };
 }
 
+export function getLastClosedRappidexWeekYmdRange(
+  referenceDate = new Date(),
+): YmdDateRange {
+  const currentWeekRange = getRappidexWeekRange(referenceDate);
+  const start = new Date(currentWeekRange.start);
+  start.setDate(start.getDate() - 7);
+
+  const end = new Date(currentWeekRange.start);
+  end.setDate(end.getDate() - 1);
+
+  return {
+    start: formatDateToYmd(start),
+    end: formatDateToYmd(end),
+  };
+}
+
 export function createLocalDate(dateString: string, endOfDay = false): Date {
   const [year, month, day] = dateString.split("-").map(Number);
 

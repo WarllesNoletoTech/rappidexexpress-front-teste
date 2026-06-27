@@ -15,7 +15,10 @@ import { ChartLineUp, MapPin, Money, WhatsappLogo } from "phosphor-react";
 import { DeliveryContext } from "../../context/DeliveryContext";
 import api, { SOCKET_URL } from "../../services/api";
 import { City, Motoboy, Report } from "../../shared/interfaces";
-import type { DeliveryPerformancePeriods } from "../../shared/utils/deliveryPerformance";
+import type {
+  DeliveryPerformance,
+  DeliveryPerformancePeriods,
+} from "../../shared/utils/deliveryPerformance";
 import {
   getLinkToWhatsapp,
   messageTypes,
@@ -25,6 +28,7 @@ import {
   AdminCitySelect,
   AdminFinancialCard,
   BaseButton,
+  ClosedWeekSettlementCard,
   Container,
   ContainerButtons,
   ContainerDeliveries,
@@ -48,6 +52,8 @@ import {
   PerformanceMetric,
   PerformanceMetrics,
   PerformanceValue,
+  SettlementDetails,
+  SettlementMessage,
   DeliveryGainToast,
   OrderActions,
   OrderButton,
@@ -66,6 +72,7 @@ import {
 import {
   calculateReportsMotoboyTotal,
   formatMotoboyDeliveryGain,
+  getLastClosedRappidexWeekYmdRange,
   getMotoboyDeliveryValue,
   getRappidexWeekYmdRange,
   getTodayYmdRange,
@@ -703,6 +710,8 @@ export function Dashboard() {
   const [performancePeriod, setPerformancePeriod] = useState<"week" | "today">(
     "week",
   );
+  const [closedWeekSettlement, setClosedWeekSettlement] =
+    useState<DeliveryPerformance>({ count: 0, total: 0 });
   const [cities, setCities] = useState<City[]>([]);
   const [motoboys, setMotoboys] = useState<Motoboy[]>([]);
   const [pendingCount, setPendingCount] = useState<number>(0);
@@ -871,6 +880,21 @@ export function Dashboard() {
       }),
     [selectedPerformance.total],
   );
+  const formattedClosedWeekSettlementValue = useMemo(
+    () =>
+      closedWeekSettlement.total.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      }),
+    [closedWeekSettlement.total],
+  );
+  const closedWeekSettlementMessage =
+    new Date().getDay() === 5
+      ? "Repasse previsto para hoje"
+      : "Aguarde o repasse na sexta-feira";
+  const shouldShowClosedWeekSettlement =
+    isCurrentUserMotoboy &&
+    (closedWeekSettlement.count > 0 || closedWeekSettlement.total > 0);
   const isAdminDashboardUser =
     permission === UserType.ADMIN || permission === UserType.SUPERADMIN;
   const formattedAdminDeliveryFee = useMemo(
@@ -1086,12 +1110,25 @@ export function Dashboard() {
     [currentCityId, isCurrentUserSuperAdmin, status],
   );
 
+  const getReportsFromCurrentMotoboy = useCallback(
+    (rawReports: Report[]) => {
+      return rawReports.filter((report) => {
+        const assignedMotoboyId =
+          report.motoboyId || report.motoboy?.id || report.motoboy?._id;
+
+        return String(assignedMotoboyId) === String(currentUserId);
+      });
+    },
+    [currentUserId],
+  );
+
   const refreshDeliveryPerformance = useCallback(async () => {
     if (!isCurrentUserMotoboy || !currentUserId) {
       setDeliveryPerformanceCounts({
         today: { count: 0, total: 0 },
         week: { count: 0, total: 0 },
       });
+      setClosedWeekSettlement({ count: 0, total: 0 });
       return;
     }
 
@@ -1099,38 +1136,58 @@ export function Dashboard() {
       const itemsPerPage = 500;
       const todayRange = getTodayYmdRange();
       const weekRange = getRappidexWeekYmdRange();
+      const closedWeekRange = getLastClosedRappidexWeekYmdRange();
 
-      const [todayResponse, weekResponse] = await Promise.all([
-        api.get(
-          `/delivery?status=${StatusDelivery.FINISHED}&createdIn=${todayRange.start}&createdUntil=${todayRange.end}&itemsPerPage=${itemsPerPage}`,
-        ),
-        api.get(
-          `/delivery?status=${StatusDelivery.FINISHED}&createdIn=${weekRange.start}&createdUntil=${weekRange.end}&itemsPerPage=${itemsPerPage}`,
-        ),
-      ]);
+      const [todayResponse, weekResponse, closedWeekResponse] =
+        await Promise.all([
+          api.get(
+            `/delivery?status=${StatusDelivery.FINISHED}&createdIn=${todayRange.start}&createdUntil=${todayRange.end}&itemsPerPage=${itemsPerPage}`,
+          ),
+          api.get(
+            `/delivery?status=${StatusDelivery.FINISHED}&createdIn=${weekRange.start}&createdUntil=${weekRange.end}&itemsPerPage=${itemsPerPage}`,
+          ),
+          api.get(
+            `/delivery?status=${StatusDelivery.FINISHED}&createdIn=${closedWeekRange.start}&createdUntil=${closedWeekRange.end}&itemsPerPage=${itemsPerPage}`,
+          ),
+        ]);
 
-      const todayReports = Array.isArray(todayResponse.data?.data)
-        ? todayResponse.data.data
-        : [];
+      const todayReports = getReportsFromCurrentMotoboy(
+        Array.isArray(todayResponse.data?.data) ? todayResponse.data.data : [],
+      );
 
-      const weekReports = Array.isArray(weekResponse.data?.data)
-        ? weekResponse.data.data
-        : [];
+      const weekReports = getReportsFromCurrentMotoboy(
+        Array.isArray(weekResponse.data?.data) ? weekResponse.data.data : [],
+      );
+
+      const closedWeekReports = getReportsFromCurrentMotoboy(
+        Array.isArray(closedWeekResponse.data?.data)
+          ? closedWeekResponse.data.data
+          : [],
+      );
 
       setDeliveryPerformanceCounts({
         today: {
-          count: Number(todayResponse.data?.count) || todayReports.length,
+          count: todayReports.length,
           total: calculateReportsMotoboyTotal(todayReports, cities),
         },
         week: {
-          count: Number(weekResponse.data?.count) || weekReports.length,
+          count: weekReports.length,
           total: calculateReportsMotoboyTotal(weekReports, cities),
         },
+      });
+      setClosedWeekSettlement({
+        count: closedWeekReports.length,
+        total: calculateReportsMotoboyTotal(closedWeekReports, cities),
       });
     } catch (error) {
       console.error("Erro ao carregar desempenho do motoboy:", error);
     }
-  }, [cities, currentUserId, isCurrentUserMotoboy]);
+  }, [
+    cities,
+    currentUserId,
+    getReportsFromCurrentMotoboy,
+    isCurrentUserMotoboy,
+  ]);
 
   const getCities = useCallback(async () => {
     try {
@@ -1943,6 +2000,19 @@ export function Dashboard() {
             </AdminCitySelect>
           )}
         </AdminFinancialCard>
+      )}
+
+      {shouldShowClosedWeekSettlement && (
+        <ClosedWeekSettlementCard aria-label="Valor a receber da semana fechada">
+          <Money size={24} weight="duotone" aria-hidden="true" />
+          <SettlementDetails>
+            <span>Valor a receber</span>
+            <PerformanceValue>
+              {formattedClosedWeekSettlementValue}
+            </PerformanceValue>
+            <SettlementMessage>{closedWeekSettlementMessage}</SettlementMessage>
+          </SettlementDetails>
+        </ClosedWeekSettlementCard>
       )}
 
       {isCurrentUserMotoboy && (

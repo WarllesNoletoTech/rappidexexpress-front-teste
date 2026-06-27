@@ -89,6 +89,17 @@ export function getClosedWeekSettlementMessage(referenceDate = new Date()) {
     : "Aguarde o repasse na sexta-feira";
 }
 
+export function getClosedWeekSettlementDisplayMessage(
+  hasPendingValue: boolean,
+  referenceDate = new Date(),
+) {
+  if (!hasPendingValue) {
+    return "Nenhum valor a receber da semana anterior";
+  }
+
+  return getClosedWeekSettlementMessage(referenceDate);
+}
+
 export function createLocalDate(dateString: string, endOfDay = false): Date {
   const [year, month, day] = dateString.split("-").map(Number);
 

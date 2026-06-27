@@ -9,6 +9,7 @@ import {
   createLocalDate,
   formatDateToYmd,
   formatMotoboyDeliveryGain,
+  getClosedWeekSettlementDisplayMessage,
   getClosedWeekSettlementMessage,
   getMotoboyDeliveryValue,
   getLastClosedRappidexWeekYmdRange,
@@ -102,6 +103,21 @@ test("usa a mensagem correta para o repasse da semana fechada", () => {
   assert.equal(
     getClosedWeekSettlementMessage(new Date(2026, 5, 12)),
     "Repasse previsto para hoje",
+  );
+});
+
+test("mostra mensagem de nenhum valor a receber quando a semana fechada zerou", () => {
+  assert.equal(
+    getClosedWeekSettlementDisplayMessage(false, new Date(2026, 5, 9)),
+    "Nenhum valor a receber da semana anterior",
+  );
+  assert.equal(
+    getClosedWeekSettlementDisplayMessage(false, new Date(2026, 5, 12)),
+    "Nenhum valor a receber da semana anterior",
+  );
+  assert.equal(
+    getClosedWeekSettlementDisplayMessage(true, new Date(2026, 5, 9)),
+    "Aguarde o repasse na sexta-feira",
   );
 });
 

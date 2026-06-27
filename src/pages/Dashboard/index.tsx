@@ -72,7 +72,7 @@ import {
 import {
   calculateReportsMotoboyTotal,
   formatMotoboyDeliveryGain,
-  getClosedWeekSettlementMessage,
+  getClosedWeekSettlementDisplayMessage,
   getLastClosedRappidexWeekYmdRange,
   getMotoboyDeliveryValue,
   getRappidexWeekYmdRange,
@@ -890,11 +890,13 @@ export function Dashboard() {
       }),
     [closedWeekSettlement.total],
   );
+  const hasClosedWeekSettlementValue =
+    closedWeekSettlement.count > 0 || closedWeekSettlement.total > 0;
   const shouldShowClosedWeekSettlement =
-    isCurrentUserMotoboy &&
-    isClosedWeekSettlementWaitingRepasseDay() &&
-    (closedWeekSettlement.count > 0 || closedWeekSettlement.total > 0);
-  const closedWeekSettlementMessage = getClosedWeekSettlementMessage();
+    isCurrentUserMotoboy && isClosedWeekSettlementWaitingRepasseDay();
+  const closedWeekSettlementMessage = getClosedWeekSettlementDisplayMessage(
+    hasClosedWeekSettlementValue,
+  );
   const isAdminDashboardUser =
     permission === UserType.ADMIN || permission === UserType.SUPERADMIN;
   const formattedAdminDeliveryFee = useMemo(

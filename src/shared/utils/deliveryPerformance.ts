@@ -74,6 +74,21 @@ export function getLastClosedRappidexWeekYmdRange(
   };
 }
 
+export function isClosedWeekSettlementWaitingRepasseDay(
+  referenceDate = new Date(),
+): boolean {
+  const currentDay = referenceDate.getDay();
+
+  // A semana fecha na segunda. De terça até sexta o valor fica aguardando repasse.
+  return currentDay >= 2 && currentDay <= 5;
+}
+
+export function getClosedWeekSettlementMessage(referenceDate = new Date()) {
+  return referenceDate.getDay() === 5
+    ? "Repasse previsto para hoje"
+    : "Aguarde o repasse na sexta-feira";
+}
+
 export function createLocalDate(dateString: string, endOfDay = false): Date {
   const [year, month, day] = dateString.split("-").map(Number);
 

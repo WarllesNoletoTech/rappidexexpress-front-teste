@@ -9,11 +9,13 @@ import {
   createLocalDate,
   formatDateToYmd,
   formatMotoboyDeliveryGain,
+  getClosedWeekSettlementMessage,
   getMotoboyDeliveryValue,
   getLastClosedRappidexWeekYmdRange,
   getRappidexWeekRange,
   getRappidexWeekYmdRange,
   getTodayYmdRange,
+  isClosedWeekSettlementWaitingRepasseDay,
 } from "../deliveryPerformance";
 
 const city: City = { id: "city-1", name: "Cidade", deliveryValue: "R$ 8,50" };
@@ -79,6 +81,28 @@ test("cria filtros YYYY-MM-DD da última semana Rappidex fechada", () => {
     start: "2026-06-02",
     end: "2026-06-08",
   });
+});
+
+
+test("mostra o card de repasse apenas de terça até sexta", () => {
+  assert.equal(isClosedWeekSettlementWaitingRepasseDay(new Date(2026, 5, 9)), true);
+  assert.equal(isClosedWeekSettlementWaitingRepasseDay(new Date(2026, 5, 10)), true);
+  assert.equal(isClosedWeekSettlementWaitingRepasseDay(new Date(2026, 5, 11)), true);
+  assert.equal(isClosedWeekSettlementWaitingRepasseDay(new Date(2026, 5, 12)), true);
+  assert.equal(isClosedWeekSettlementWaitingRepasseDay(new Date(2026, 5, 13)), false);
+  assert.equal(isClosedWeekSettlementWaitingRepasseDay(new Date(2026, 5, 14)), false);
+  assert.equal(isClosedWeekSettlementWaitingRepasseDay(new Date(2026, 5, 15)), false);
+});
+
+test("usa a mensagem correta para o repasse da semana fechada", () => {
+  assert.equal(
+    getClosedWeekSettlementMessage(new Date(2026, 5, 9)),
+    "Aguarde o repasse na sexta-feira",
+  );
+  assert.equal(
+    getClosedWeekSettlementMessage(new Date(2026, 5, 12)),
+    "Repasse previsto para hoje",
+  );
 });
 
 test("cria limites locais inclusivos para o filtro manual", () => {

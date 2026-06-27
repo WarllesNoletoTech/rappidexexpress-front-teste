@@ -72,10 +72,12 @@ import {
 import {
   calculateReportsMotoboyTotal,
   formatMotoboyDeliveryGain,
+  getClosedWeekSettlementMessage,
   getLastClosedRappidexWeekYmdRange,
   getMotoboyDeliveryValue,
   getRappidexWeekYmdRange,
   getTodayYmdRange,
+  isClosedWeekSettlementWaitingRepasseDay,
 } from "../../shared/utils/deliveryPerformance";
 
 type DeliveryUpdateData = {
@@ -888,13 +890,11 @@ export function Dashboard() {
       }),
     [closedWeekSettlement.total],
   );
-  const closedWeekSettlementMessage =
-    new Date().getDay() === 5
-      ? "Repasse previsto para hoje"
-      : "Aguarde o repasse na sexta-feira";
   const shouldShowClosedWeekSettlement =
     isCurrentUserMotoboy &&
+    isClosedWeekSettlementWaitingRepasseDay() &&
     (closedWeekSettlement.count > 0 || closedWeekSettlement.total > 0);
+  const closedWeekSettlementMessage = getClosedWeekSettlementMessage();
   const isAdminDashboardUser =
     permission === UserType.ADMIN || permission === UserType.SUPERADMIN;
   const formattedAdminDeliveryFee = useMemo(

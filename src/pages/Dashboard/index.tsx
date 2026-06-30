@@ -26,6 +26,8 @@ import {
 
 import {
   AdminCitySelect,
+  AdminDateInput,
+  AdminFilters,
   AdminFinancialCard,
   BaseButton,
   ClosedWeekSettlementCard,
@@ -100,6 +102,8 @@ type AdminFinancialCounts = {
   totalValorAdmin: number;
   cityId?: string | null;
   cityName?: string | null;
+  createdIn?: string | null;
+  createdUntil?: string | null;
 };
 
 type DeliveryCardProps = {
@@ -726,6 +730,8 @@ export function Dashboard() {
       totalValorAdmin: 0,
       cityId: null,
       cityName: null,
+      createdIn: null,
+      createdUntil: null,
     });
   const [updatingDeliveryIds, setUpdatingDeliveryIds] = useState<Set<string>>(
     () => new Set(),
@@ -759,6 +765,10 @@ export function Dashboard() {
   );
   const [isCurrentUserSuperAdmin, setIsCurrentUserSuperAdmin] =
     useState<boolean>(permission === UserType.SUPERADMIN);
+  const defaultAdminCounterRange = useMemo(() => getRappidexWeekYmdRange(), []);
+  const [adminCounterDateRange, setAdminCounterDateRange] = useState(
+    () => defaultAdminCounterRange,
+  );
   const reloadTimeoutRef = useRef<number | null>(null);
   const refreshRequestIdRef = useRef(0);
   const didFirstLoadRef = useRef(false);
@@ -1058,6 +1068,8 @@ export function Dashboard() {
         if (isCurrentUserSuperAdmin && currentCityId) {
           countsParams.set("cityId", currentCityId);
         }
+        countsParams.set("createdIn", adminCounterDateRange.start);
+        countsParams.set("createdUntil", adminCounterDateRange.end);
 
         const deliveryParams = new URLSearchParams({ status });
         if (isCurrentUserSuperAdmin && currentCityId) {
@@ -1096,6 +1108,10 @@ export function Dashboard() {
           totalValorAdmin: Number(countsResponse.data?.totalValorAdmin) || 0,
           cityId: countsResponse.data?.cityId ?? null,
           cityName: countsResponse.data?.cityName ?? null,
+          createdIn:
+            countsResponse.data?.createdIn ?? adminCounterDateRange.start,
+          createdUntil:
+            countsResponse.data?.createdUntil ?? adminCounterDateRange.end,
         });
       } catch (error: any) {
         if (requestId !== refreshRequestIdRef.current) {
@@ -1109,7 +1125,13 @@ export function Dashboard() {
         }
       }
     },
-    [currentCityId, isCurrentUserSuperAdmin, status],
+    [
+      adminCounterDateRange.end,
+      adminCounterDateRange.start,
+      currentCityId,
+      isCurrentUserSuperAdmin,
+      status,
+    ],
   );
 
   const getReportsFromCurrentMotoboy = useCallback(
@@ -1987,20 +2009,50 @@ export function Dashboard() {
               </strong>
             </PerformanceMetric>
           </PerformanceMetrics>
-          {isCurrentUserSuperAdmin && (
-            <AdminCitySelect
-              value={currentCityId}
-              onChange={(event) => setCurrentCityId(event.target.value)}
-              aria-label="Selecionar cidade do contador administrativo"
-            >
-              <option value="">Selecione a cidade</option>
-              {cities.map((city) => (
-                <option key={city.id} value={city.id}>
-                  {city.name}
-                </option>
-              ))}
-            </AdminCitySelect>
-          )}
+          <AdminFilters>
+            <label>
+              Início
+              <AdminDateInput
+                type="date"
+                value={adminCounterDateRange.start}
+                onChange={(event) =>
+                  setAdminCounterDateRange((range) => ({
+                    ...range,
+                    start: event.target.value,
+                  }))
+                }
+                aria-label="Data inicial do contador administrativo"
+              />
+            </label>
+            <label>
+              Fim
+              <AdminDateInput
+                type="date"
+                value={adminCounterDateRange.end}
+                onChange={(event) =>
+                  setAdminCounterDateRange((range) => ({
+                    ...range,
+                    end: event.target.value,
+                  }))
+                }
+                aria-label="Data final do contador administrativo"
+              />
+            </label>
+            {isCurrentUserSuperAdmin && (
+              <AdminCitySelect
+                value={currentCityId}
+                onChange={(event) => setCurrentCityId(event.target.value)}
+                aria-label="Selecionar cidade do contador administrativo"
+              >
+                <option value="">Selecione a cidade</option>
+                {cities.map((city) => (
+                  <option key={city.id} value={city.id}>
+                    {city.name}
+                  </option>
+                ))}
+              </AdminCitySelect>
+            )}
+          </AdminFilters>
         </AdminFinancialCard>
       )}
 

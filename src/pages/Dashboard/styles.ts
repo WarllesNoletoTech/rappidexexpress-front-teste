@@ -818,6 +818,45 @@ export const AdminFinancialCard = styled.div`
   }
 `;
 
+export const AdminFilters = styled.div`
+  flex-shrink: 0;
+  display: flex;
+  align-items: end;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    color: ${(props) => props.theme["gray-300"]};
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  @media (max-width: 600px) {
+    width: 100%;
+    align-items: stretch;
+  }
+`;
+
+const AdminFilterControl = styled.input`
+  min-width: 10rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: ${(props) => props.theme["radius-sm"]};
+  background: ${(props) => props.theme["gray-900"]};
+  color: ${(props) => props.theme["gray-100"]};
+  padding: 0.65rem 0.75rem;
+  font-weight: 700;
+  color-scheme: dark;
+
+  @media (max-width: 600px) {
+    width: 100%;
+  }
+`;
+
+export const AdminDateInput = styled(AdminFilterControl)``;
+
 export const AdminCitySelect = styled.select`
   flex-shrink: 0;
   min-width: 13rem;

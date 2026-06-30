@@ -68,6 +68,17 @@ export const ContainerButtons = styled.div`
   flex-wrap: wrap;
   width: min(100%, 1200px);
   margin-bottom: 0.85rem;
+  box-sizing: border-box;
+
+  @media (max-width: 768px) {
+    align-items: stretch;
+    justify-content: stretch;
+    gap: 0.55rem;
+  }
+
+  @media (max-width: 480px) {
+    gap: 0.45rem;
+  }
 `;
 
 export const ShopkeeperCreditsContainer = styled.div`
@@ -128,6 +139,7 @@ interface ButtonProps {
 
 export const BaseButton = styled.div<ButtonProps>`
   flex: 1 1 12rem;
+  box-sizing: border-box;
   min-height: 3rem;
   background: ${(props) =>
     props.typeReport ? props.theme["brand-yellow"] : props.theme["gray-700"]};
@@ -159,7 +171,17 @@ export const BaseButton = styled.div<ButtonProps>`
     transform: translateY(-1px);
   }
 
+  @media (max-width: 768px) {
+    flex: 1 1 calc(50% - 0.55rem);
+    min-width: min(100%, 11rem);
+    white-space: normal;
+    text-align: center;
+  }
+
   @media (max-width: 480px) {
+    flex-basis: 100%;
+    min-width: 0;
+    width: 100%;
     padding: 0.85rem;
     font-size: 0.95rem;
   }
@@ -753,6 +775,8 @@ export const PerformanceMetrics = styled.span`
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.75rem 1.5rem;
+  min-width: 0;
+  width: 100%;
 
   @media (max-width: 480px) {
     grid-template-columns: 1fr;
@@ -764,6 +788,7 @@ export const PerformanceMetric = styled.span`
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
+  min-width: 0;
   color: ${(props) => props.theme["gray-300"]};
   font-size: 0.82rem;
   font-weight: 700;
@@ -771,6 +796,7 @@ export const PerformanceMetric = styled.span`
   strong {
     color: ${(props) => props.theme["gray-100"]};
     font-size: 1.35rem;
+    overflow-wrap: anywhere;
   }
 `;
 
@@ -791,6 +817,8 @@ export const PerformanceHint = styled.span`
 
 export const AdminFinancialCard = styled.div`
   width: min(100%, 1200px);
+  max-width: 1200px;
+  box-sizing: border-box;
   margin: 0.5rem 0 1rem;
   padding: 1rem 1.15rem;
   display: flex;
@@ -811,10 +839,52 @@ export const AdminFinancialCard = styled.div`
     color: ${(props) => props.theme["brand-yellow"]};
   }
 
-  @media (max-width: 600px) {
+  ${PerformanceMetrics} {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  @media (max-width: 768px) {
+    position: relative;
+    flex-direction: column;
     align-items: flex-start;
-    gap: 0.75rem;
-    padding: 0.9rem;
+    gap: 1rem;
+    padding: 1rem;
+    overflow: visible;
+
+    > svg {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 1.25rem;
+      height: 1.25rem;
+      opacity: 0.85;
+    }
+
+    ${PerformanceMetrics} {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      padding-right: 2rem;
+      box-sizing: border-box;
+    }
+  }
+
+  @media (max-width: 480px) {
+    gap: 0.85rem;
+    padding: 0.85rem;
+    border-radius: 0.875rem;
+
+    ${PerformanceMetrics} {
+      grid-template-columns: 1fr;
+      gap: 0.65rem;
+      padding-right: 1.75rem;
+    }
+
+    ${PerformanceMetric} {
+      font-size: 0.78rem;
+
+      strong {
+        font-size: 1.18rem;
+      }
+    }
   }
 `;
 
@@ -824,34 +894,62 @@ export const AdminFilters = styled.div`
   align-items: end;
   gap: 0.75rem;
   flex-wrap: wrap;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 
   label {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+    min-width: 0;
     color: ${(props) => props.theme["gray-300"]};
     font-size: 0.75rem;
     font-weight: 700;
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: 768px) {
     width: 100%;
+    flex-direction: column;
     align-items: stretch;
+    gap: 0.7rem;
+
+    label {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 480px) {
+    gap: 0.55rem;
+
+    label {
+      font-size: 0.72rem;
+    }
   }
 `;
 
 const AdminFilterControl = styled.input`
   min-width: 10rem;
+  width: 100%;
+  box-sizing: border-box;
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: ${(props) => props.theme["radius-sm"]};
   background: ${(props) => props.theme["gray-900"]};
   color: ${(props) => props.theme["gray-100"]};
-  padding: 0.65rem 0.75rem;
+  padding: 0.7rem 0.8rem;
   font-weight: 700;
+  font-size: 0.95rem;
   color-scheme: dark;
 
-  @media (max-width: 600px) {
+  @media (max-width: 768px) {
+    min-width: 0;
     width: 100%;
+    min-height: 2.85rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.75rem 0.8rem;
+    font-size: 0.9rem;
   }
 `;
 
@@ -860,14 +958,25 @@ export const AdminDateInput = styled(AdminFilterControl)``;
 export const AdminCitySelect = styled.select`
   flex-shrink: 0;
   min-width: 13rem;
+  max-width: 100%;
+  box-sizing: border-box;
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: ${(props) => props.theme["radius-sm"]};
   background: ${(props) => props.theme["gray-900"]};
   color: ${(props) => props.theme["gray-100"]};
-  padding: 0.65rem 0.75rem;
+  padding: 0.7rem 0.8rem;
   font-weight: 700;
+  font-size: 0.95rem;
+  z-index: 2;
 
-  @media (max-width: 600px) {
+  @media (max-width: 768px) {
+    min-width: 0;
     width: 100%;
+    min-height: 2.85rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.75rem 0.8rem;
+    font-size: 0.9rem;
   }
 `;

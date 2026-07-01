@@ -626,7 +626,7 @@ export function NewUser() {
                       id="ifoodWithoutPreparationTime"
                       {...register("ifoodWithoutPreparationTime")}
                     />{" "}
-                    Sem tempo de preparo: pedido iFood vai direto para Livres
+                    Sem tempo de preparo — pedidos do iFood irão direto para Livres.
                   </label>
                   <label htmlFor="ifoodMerchantId">iFood Merchant ID (legado):</label>
                   <BaseInput

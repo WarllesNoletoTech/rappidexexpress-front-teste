@@ -394,7 +394,7 @@ export function IfoodClients() {
                           }
                           type="checkbox"
                         />
-                        Sem tempo de preparo: pedido iFood vai direto para Livres
+                        Sem tempo de preparo — pedidos do iFood irão direto para Livres.
                       </Checkbox>
                     )}
                   </ToggleGroup>

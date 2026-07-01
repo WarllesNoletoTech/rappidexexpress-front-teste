@@ -319,9 +319,11 @@ const DeliveryCard = memo(function DeliveryCard({
     (report as any).ifoodDisplayId ||
     (report as any).ifoodOrderId ||
     null;
+  const rawOrderLocator = String((report as any).orderLocator || "").trim();
   const orderLocator =
-    String((report as any).orderLocator || ifoodOrderNumber || '').trim() ||
-    null;
+    rawOrderLocator && rawOrderLocator !== ifoodOrderNumber
+      ? rawOrderLocator
+      : null;
   const ifoodClientLocationLink =
     report.addressMapsUrl ||
     getIfoodClientLocationLink(report.observation, report.clientLocation);

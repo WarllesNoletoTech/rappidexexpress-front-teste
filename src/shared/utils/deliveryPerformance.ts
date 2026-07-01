@@ -181,53 +181,33 @@ function getFinishedDate(report: Report): Date | null {
   return Number.isNaN(finishedDate.getTime()) ? null : finishedDate;
 }
 
-function getCityId(city: City) {
-  return String(city.id ?? (city as { _id?: string })._id ?? "").trim();
-}
-
-function getReportCityId(report: Report) {
-  return String(
-    report.establishmentCityId ||
-      report.cityId ||
-      report.establishment?.cityId ||
-      report.motoboy?.cityId ||
-      "",
-  ).trim();
-}
-
 function getCityDeliveryValue(
   report: Report,
   deliveryValueByCityId: Map<string, number>,
 ) {
-  const cityId = getReportCityId(report);
+  const cityId = String(
+    report.establishmentCityId ||
+      report.cityId ||
+      report.establishment?.cityId ||
+      "",
+  ).trim();
+  if (!cityId) return 0;
 
-  if (cityId && deliveryValueByCityId.has(cityId)) {
-    return deliveryValueByCityId.get(cityId) ?? 0;
-  }
-
-  if (!cityId && deliveryValueByCityId.size === 1) {
-    return deliveryValueByCityId.values().next().value ?? 0;
-  }
-
-  return 0;
+  return deliveryValueByCityId.get(cityId) ?? 0;
 }
 
-function buildDeliveryValueByCityId(cities: City[]) {
+export function getMotoboyDeliveryValue(report: Report, cities: City[]) {
   const deliveryValueByCityId = new Map<string, number>();
 
   cities.forEach((city) => {
-    const cityId = getCityId(city);
+    const cityId = String(city.id ?? "").trim();
 
     if (cityId) {
       deliveryValueByCityId.set(cityId, parseDeliveryValue(city.deliveryValue));
     }
   });
 
-  return deliveryValueByCityId;
-}
-
-export function getMotoboyDeliveryValue(report: Report, cities: City[]) {
-  return getCityDeliveryValue(report, buildDeliveryValueByCityId(cities));
+  return getCityDeliveryValue(report, deliveryValueByCityId);
 }
 
 export function calculateReportsMotoboyTotal(
@@ -260,8 +240,13 @@ export function calculateDeliveryPerformance(
     week: { count: 0, total: 0 },
   };
 
-  buildDeliveryValueByCityId(cities).forEach((deliveryValue, cityId) => {
-    deliveryValueByCityId.set(cityId, deliveryValue);
+  cities.forEach((city) => {
+    const cityId = String(city.id ?? "").trim();
+    const deliveryValue = parseDeliveryValue(city.deliveryValue);
+
+    if (cityId) {
+      deliveryValueByCityId.set(cityId, deliveryValue);
+    }
   });
 
   reports.forEach((report) => {

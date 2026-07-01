@@ -70,58 +70,29 @@ test("cria filtros YYYY-MM-DD da semana Rappidex de terça a segunda", () => {
 });
 
 test("cria filtros YYYY-MM-DD da última semana Rappidex fechada", () => {
-  assert.deepEqual(
-    getLastClosedRappidexWeekYmdRange(new Date(2026, 5, 9, 12)),
-    {
-      start: "2026-06-02",
-      end: "2026-06-08",
-    },
-  );
-  assert.deepEqual(
-    getLastClosedRappidexWeekYmdRange(new Date(2026, 5, 12, 12)),
-    {
-      start: "2026-06-02",
-      end: "2026-06-08",
-    },
-  );
-  assert.deepEqual(
-    getLastClosedRappidexWeekYmdRange(new Date(2026, 5, 15, 12)),
-    {
-      start: "2026-06-02",
-      end: "2026-06-08",
-    },
-  );
+  assert.deepEqual(getLastClosedRappidexWeekYmdRange(new Date(2026, 5, 9, 12)), {
+    start: "2026-06-02",
+    end: "2026-06-08",
+  });
+  assert.deepEqual(getLastClosedRappidexWeekYmdRange(new Date(2026, 5, 12, 12)), {
+    start: "2026-06-02",
+    end: "2026-06-08",
+  });
+  assert.deepEqual(getLastClosedRappidexWeekYmdRange(new Date(2026, 5, 15, 12)), {
+    start: "2026-06-02",
+    end: "2026-06-08",
+  });
 });
 
+
 test("mostra o card de repasse apenas de terça até sexta", () => {
-  assert.equal(
-    isClosedWeekSettlementWaitingRepasseDay(new Date(2026, 5, 9)),
-    true,
-  );
-  assert.equal(
-    isClosedWeekSettlementWaitingRepasseDay(new Date(2026, 5, 10)),
-    true,
-  );
-  assert.equal(
-    isClosedWeekSettlementWaitingRepasseDay(new Date(2026, 5, 11)),
-    true,
-  );
-  assert.equal(
-    isClosedWeekSettlementWaitingRepasseDay(new Date(2026, 5, 12)),
-    true,
-  );
-  assert.equal(
-    isClosedWeekSettlementWaitingRepasseDay(new Date(2026, 5, 13)),
-    false,
-  );
-  assert.equal(
-    isClosedWeekSettlementWaitingRepasseDay(new Date(2026, 5, 14)),
-    false,
-  );
-  assert.equal(
-    isClosedWeekSettlementWaitingRepasseDay(new Date(2026, 5, 15)),
-    false,
-  );
+  assert.equal(isClosedWeekSettlementWaitingRepasseDay(new Date(2026, 5, 9)), true);
+  assert.equal(isClosedWeekSettlementWaitingRepasseDay(new Date(2026, 5, 10)), true);
+  assert.equal(isClosedWeekSettlementWaitingRepasseDay(new Date(2026, 5, 11)), true);
+  assert.equal(isClosedWeekSettlementWaitingRepasseDay(new Date(2026, 5, 12)), true);
+  assert.equal(isClosedWeekSettlementWaitingRepasseDay(new Date(2026, 5, 13)), false);
+  assert.equal(isClosedWeekSettlementWaitingRepasseDay(new Date(2026, 5, 14)), false);
+  assert.equal(isClosedWeekSettlementWaitingRepasseDay(new Date(2026, 5, 15)), false);
 });
 
 test("usa a mensagem correta para o repasse da semana fechada", () => {
@@ -268,36 +239,4 @@ test("soma o valor do motoboy pela cidade sem afetar a quantidade", () => {
   ];
 
   assert.equal(calculateReportsMotoboyTotal(reports, [city]), 17);
-});
-
-test("usa a cidade do motoboy quando a cidade do pedido não vem no payload", () => {
-  const finishedDelivery = report({
-    establishmentCityId: "",
-    cityId: "",
-    establishment: {},
-    motoboy: { id: "motoboy-1", cityId: "city-1" },
-  });
-
-  assert.equal(getMotoboyDeliveryValue(finishedDelivery, [city]), 8.5);
-});
-
-test("usa a única cidade carregada como fallback para evitar zerar valor configurado", () => {
-  const selectedCity: City = {
-    id: "selected-city",
-    name: "Selecionada",
-    deliveryValue: "7,00",
-  };
-  const finishedDelivery = report({
-    establishmentCityId: "",
-    cityId: "",
-    establishment: {},
-  });
-
-  assert.equal(getMotoboyDeliveryValue(finishedDelivery, [selectedCity]), 7);
-  assert.equal(
-    calculateReportsMotoboyTotal(Array(10).fill(finishedDelivery), [
-      selectedCity,
-    ]),
-    70,
-  );
 });

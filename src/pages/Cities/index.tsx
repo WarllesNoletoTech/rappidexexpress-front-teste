@@ -71,6 +71,8 @@ function getStateLabel(value?: string) {
 
 export function Cities() {
   const { token, permission } = useContext(DeliveryContext);
+  const isSuperAdmin = permission === "superadmin";
+  const isCityAdmin = permission === "admin";
   api.defaults.headers.Authorization = `Bearer ${token}`;
 
   const [cities, setCities] = useState<City[]>([]);
@@ -131,7 +133,7 @@ export function Cities() {
   }
 
   useEffect(() => {
-    if (permission === "superadmin") {
+    if (isSuperAdmin || isCityAdmin) {
       fetchCities();
       fetchCurrentUser();
     } else {
@@ -189,6 +191,11 @@ export function Cities() {
   async function handleCreateCity(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (isSubmitting) {
+      return;
+    }
+
+    if (isCityAdmin && !editingCityId) {
+      alert("Apenas Super Admin pode cadastrar novas cidades.");
       return;
     }
 
@@ -280,7 +287,7 @@ export function Cities() {
     }
   }
 
-  if (permission !== "superadmin") {
+  if (!isSuperAdmin && !isCityAdmin) {
     return <Navigate to="/" replace />;
   }
 
@@ -294,90 +301,92 @@ export function Cities() {
           </Description>
         </Header>
 
-        <CityForm onSubmit={handleCreateCity}>
-          <CityInput
-            placeholder="Nome da cidade"
-            value={cityName}
-            onChange={(event) => setCityName(event.target.value)}
-            disabled={isSubmitting}
-          />
+        {(isSuperAdmin || editingCityId) && (
+          <CityForm onSubmit={handleCreateCity}>
+            <CityInput
+              placeholder="Nome da cidade"
+              value={cityName}
+              onChange={(event) => setCityName(event.target.value)}
+              disabled={isSubmitting}
+            />
 
-          <CitySelect
-            value={selectedState}
-            onChange={(event) => setSelectedState(event.target.value)}
-            disabled={isSubmitting}
-          >
-            <option value="">Selecione o estado</option>
-            {BRAZILIAN_STATES.map((state) => (
-              <option key={state.value} value={state.value}>
-                {state.label}
-              </option>
-            ))}
-          </CitySelect>
-
-          <CityInput
-            placeholder="Valor cobrado do estabelecimento por entrega. Ex: 10,00"
-            value={deliveryFeeValue}
-            onChange={(event) => setDeliveryFeeValue(event.target.value)}
-            disabled={isSubmitting}
-          />
-
-          <CityInput
-            placeholder="Valor da Mensalidade. Ex: 99,90"
-            inputMode="decimal"
-            value={monthlyFeeValue}
-            onChange={(event) =>
-              setMonthlyFeeValue(formatCurrencyInput(event.target.value))
-            }
-            disabled={isSubmitting}
-          />
-
-          <CityInput
-            placeholder="Valor pago ao entregador por entrega. Ex: 7,00"
-            value={deliveryValue}
-            onChange={(event) => setDeliveryValue(event.target.value)}
-            disabled={isSubmitting}
-          />
-
-          <CityInput
-            placeholder="Chave PIX da cidade. Ex: financeiro@rappidex.com.br, CPF, CNPJ, telefone ou chave aleatória"
-            value={pixKey}
-            onChange={(event) => setPixKey(event.target.value)}
-            disabled={isSubmitting}
-          />
-
-          <CityTextarea
-            placeholder="Mensagem personalizada que o motoboy vai mandar ao cliente dessa cidade"
-            value={cityWhatsappMessage}
-            onChange={(event) => setCityWhatsappMessage(event.target.value)}
-            disabled={isSubmitting}
-          />
-
-          <FormActions>
-            <SubmitButton
-              type="submit"
-              disabled={isSubmitting || !cityName.trim() || !selectedState}
+            <CitySelect
+              value={selectedState}
+              onChange={(event) => setSelectedState(event.target.value)}
+              disabled={isSubmitting}
             >
-              {isSubmitting ? (
-                <Loader size={24} biggestColor="gray" smallestColor="gray" />
-              ) : editingCityId ? (
-                "Salvar alterações"
-              ) : (
-                "Cadastrar cidade"
-              )}
-            </SubmitButton>
+              <option value="">Selecione o estado</option>
+              {BRAZILIAN_STATES.map((state) => (
+                <option key={state.value} value={state.value}>
+                  {state.label}
+                </option>
+              ))}
+            </CitySelect>
 
-            {editingCityId && (
-              <CancelButton
-                type="button"
-                onClick={resetForm}
-                disabled={isSubmitting}
+            <CityInput
+              placeholder="Valor cobrado do estabelecimento por entrega. Ex: 10,00"
+              value={deliveryFeeValue}
+              onChange={(event) => setDeliveryFeeValue(event.target.value)}
+              disabled={isSubmitting}
+            />
+
+            <CityInput
+              placeholder="Valor da Mensalidade. Ex: 99,90"
+              inputMode="decimal"
+              value={monthlyFeeValue}
+              onChange={(event) =>
+                setMonthlyFeeValue(formatCurrencyInput(event.target.value))
+              }
+              disabled={isSubmitting}
+            />
+
+            <CityInput
+              placeholder="Valor pago ao entregador por entrega. Ex: 7,00"
+              value={deliveryValue}
+              onChange={(event) => setDeliveryValue(event.target.value)}
+              disabled={isSubmitting}
+            />
+
+            <CityInput
+              placeholder="Chave PIX da cidade. Ex: financeiro@rappidex.com.br, CPF, CNPJ, telefone ou chave aleatória"
+              value={pixKey}
+              onChange={(event) => setPixKey(event.target.value)}
+              disabled={isSubmitting}
+            />
+
+            <CityTextarea
+              placeholder="Mensagem personalizada que o motoboy vai mandar ao cliente dessa cidade"
+              value={cityWhatsappMessage}
+              onChange={(event) => setCityWhatsappMessage(event.target.value)}
+              disabled={isSubmitting}
+            />
+
+            <FormActions>
+              <SubmitButton
+                type="submit"
+                disabled={isSubmitting || !cityName.trim() || !selectedState}
               >
-                Cancelar edição
-              </CancelButton>
-            )}
-          </FormActions>
-        </CityForm>
+                {isSubmitting ? (
+                  <Loader size={24} biggestColor="gray" smallestColor="gray" />
+                ) : editingCityId ? (
+                  "Salvar alterações"
+                ) : (
+                  "Cadastrar cidade"
+                )}
+              </SubmitButton>
+
+              {editingCityId && (
+                <CancelButton
+                  type="button"
+                  onClick={resetForm}
+                  disabled={isSubmitting}
+                >
+                  Cancelar edição
+                </CancelButton>
+              )}
+            </FormActions>
+          </CityForm>
+        )}
 
         {loading || userLoading ? (
           <LoaderContainer>
@@ -432,23 +441,25 @@ export function Cities() {
                   </CityInfo>
 
                   <CityCardActions>
-                    <CityActionButton
-                      type="button"
-                      onClick={() => handleSelectCity(city)}
-                      disabled={isDisabled}
-                    >
-                      {isUpdating ? (
-                        <Loader
-                          size={20}
-                          biggestColor="gray"
-                          smallestColor="gray"
-                        />
-                      ) : isSelected ? (
-                        "Selecionada"
-                      ) : (
-                        "Selecionar"
-                      )}
-                    </CityActionButton>
+                    {isSuperAdmin && (
+                      <CityActionButton
+                        type="button"
+                        onClick={() => handleSelectCity(city)}
+                        disabled={isDisabled}
+                      >
+                        {isUpdating ? (
+                          <Loader
+                            size={20}
+                            biggestColor="gray"
+                            smallestColor="gray"
+                          />
+                        ) : isSelected ? (
+                          "Selecionada"
+                        ) : (
+                          "Selecionar"
+                        )}
+                      </CityActionButton>
+                    )}
 
                     <CityActionButton
                       type="button"
